@@ -4,6 +4,8 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
 using SeleniumExtras.WaitHelpers;
+using OpenQA.Selenium.Interactions;
+using System.Threading;
 
 namespace TelenorAssessment
 {
@@ -39,15 +41,16 @@ namespace TelenorAssessment
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(1000));
             wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(ele));
 
-            //IJavaScriptExecutor js = (IJavaScriptExecutor)driver; 
-            //js.ExecuteScript("arguments[0].click();", ele);
+            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].checked = true;", ele);
 
-            DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(driver);
-            fluentWait.Timeout = TimeSpan.FromMinutes(2);
+            Actions build = new Actions(driver); // heare you state ActionBuider
+            build.MoveToElement(ele).Build().Perform();
 
+            Thread.Sleep(5000);
 
-            driver.FindElement(By.XPath("//button[contains(text(),'Välj och gå vidare')]")).Click();
-            driver.Manage().Timeouts().ImplicitWait = System.TimeSpan.FromSeconds(30);
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+            js.ExecuteScript("arguments[0].click();", ele);
+            Thread.Sleep(5000);
 
             String actualTitle = driver.Title;
             Assert.AreEqual(actualTitle, expectedTitle);
